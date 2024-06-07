@@ -1,0 +1,16 @@
+{{ define "verify-magic-link" }}
+{{ template "html-open" }}
+<body>
+    <div>
+        {{ template "header" }}
+        <main class="container">
+            {{ if .IsLoggedIn }}
+                <div>yeah boi</div>
+            {{ else }}
+                <div>get fucked</div>
+            {{ end }}
+        </main>
+    </div>
+</body>
+{{ template "html-close" }}
+{{ end }}

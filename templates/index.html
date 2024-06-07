@@ -1,0 +1,50 @@
+{{ define "index" }}
+{{ template "html-open" }}
+<body>
+    <div>
+        {{ template "header" }}
+        {{ if .IsLoggedIn }}
+            <div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Id</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Role</th>
+                            <th scope="col">Inserted At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {{ range .Users }}
+                        <tr>
+                            <td>{{ .Id }}</td>
+                            <td>{{ .Email }}</td>
+                            <td>{{ .Role }}</td>
+                            <td>{{ .InsertedAt }}</td>
+                        </tr>
+                    {{ end }}
+                    </tbody>
+                </table>
+            </div>
+        {{ else }}
+            <main class="container">
+                <div>
+                    <form action="/email-request" method="POST">
+                        <fieldset>
+                            <label>
+                                login
+                                <input type="email"
+                                       name="email"
+                                       placeholder="email"
+                                       autocomplete="email" />
+                            </label>
+                        </fieldset>
+                        <input type="submit"/>
+                    </form>
+                </div>
+            </main>
+        {{end}}
+    </div>
+</body>
+{{ template "html-close" }}
+{{ end }}
