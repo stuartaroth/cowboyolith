@@ -1,4 +1,7 @@
-export WEB_SERVER_URL=http://localhost:8080
+export WEB_SERVER_URL=https://localhost:8080
+export WEB_SERVER_PORT=8080
+export WEB_SERVER_CERT_FILE=localhost.pem
+export WEB_SERVER_KEY_FILE=localhost-key.pem
 
 export POSTGRES_HOST=localhost
 export POSTGRES_PORT=5432

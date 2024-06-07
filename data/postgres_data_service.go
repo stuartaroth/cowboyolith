@@ -15,7 +15,7 @@ type postgresDataService struct {
 	db *sql.DB
 }
 
-func NewPostgresDataService(logger *slog.Logger) (DataService, error) {
+func NewPostgresDataService() (DataService, error) {
 	host := os.Getenv("POSTGRES_HOST")
 	port := os.Getenv("POSTGRES_PORT")
 	dbname := os.Getenv("POSTGRES_DATABASE")
@@ -39,7 +39,7 @@ func (p postgresDataService) GetAllUsers() ([]User, error) {
 	emptyUsers := make([]User, 0)
 	users := make([]User, 0)
 
-	rows, err := p.db.Query("select id, email, role, inserted_at from users;")
+	rows, err := p.db.Query("select id, email, is_admin, inserted_at from users;")
 	if err != nil {
 		return emptyUsers, err
 	}
@@ -123,7 +123,7 @@ func (p postgresDataService) CreateUserSession(userId, id, cookieTokenValue stri
 
 func (p postgresDataService) GetUserByEmail(email string) (User, error) {
 	var u User
-	rows, err := p.db.Query("select id, email, role, inserted_at from users where email = $1;", email)
+	rows, err := p.db.Query("select id, email, is_admin, inserted_at from users where email = $1;", email)
 	if err != nil {
 		return u, err
 	}
@@ -150,7 +150,7 @@ func (p postgresDataService) DeletePendingUserSession(id string) error {
 
 func ScanUser(rows *sql.Rows) (User, error) {
 	var u User
-	err := rows.Scan(&u.Id, &u.Email, &u.Role, &u.InsertedAt)
+	err := rows.Scan(&u.Id, &u.Email, &u.IsAdmin, &u.InsertedAt)
 	if err != nil {
 		return u, err
 	}

@@ -3,14 +3,11 @@ package email
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ses"
 	"github.com/aws/aws-sdk-go-v2/service/ses/types"
 	"html/template"
-	"log/slog"
-	"os"
 )
 
 type sesEmailService struct {
@@ -19,12 +16,7 @@ type sesEmailService struct {
 	templates    *template.Template
 }
 
-func NewSesEmailService(logger *slog.Logger, templates *template.Template) (EmailService, error) {
-	webServerUrl := os.Getenv("WEB_SERVER_URL")
-	if webServerUrl == "" {
-		return sesEmailService{}, errors.New("env WEB_SERVER_URL must be set")
-	}
-
+func NewSesEmailService(webServerUrl string, templates *template.Template) (EmailService, error) {
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		return sesEmailService{}, err

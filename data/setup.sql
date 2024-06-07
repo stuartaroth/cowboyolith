@@ -1,9 +1,3 @@
--- postgres
--- peepoo
-
--- drop database if exists cowboyolith;
--- create database cowboyolith;
-
 create table users (
    id uuid primary key,
    email text not null,

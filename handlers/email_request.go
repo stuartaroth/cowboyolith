@@ -11,8 +11,12 @@ func (h Handlers) EmailRequestHandler(w http.ResponseWriter, r *http.Request) {
 	cookieTokenValue := uuid.NewString()
 
 	cookieToken := http.Cookie{
-		Name:  "pendingCookieToken",
-		Value: cookieTokenValue,
+		Name:     "pendingCookieToken",
+		Value:    cookieTokenValue,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   120, // seconds
 	}
 
 	http.SetCookie(w, &cookieToken)

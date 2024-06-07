@@ -1,2 +1,4 @@
 .idea/
-env.sh
+env-dev.sh
+localhost.pem
+localhost-key.pem

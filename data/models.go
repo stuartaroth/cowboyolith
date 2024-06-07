@@ -3,7 +3,7 @@ package data
 type User struct {
 	Id         string
 	Email      string
-	Role       string
+	IsAdmin    bool
 	InsertedAt string
 }
 
