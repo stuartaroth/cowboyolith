@@ -5,6 +5,10 @@ import (
 )
 
 func (h Handlers) LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "TRACE" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
 
 	sessionId, err := getCookie(r, "cookieSessionId")
 	if err == nil {

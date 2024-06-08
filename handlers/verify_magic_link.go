@@ -6,6 +6,11 @@ import (
 )
 
 func (h Handlers) VerifyMagicLinkHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "TRACE" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
 	verifyMagicLinkTemplate := "verify-magic-link"
 	templateData := struct {
 		IsLoggedIn bool

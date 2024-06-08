@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/stuartaroth/cowboyolith/data"
@@ -46,6 +47,25 @@ func (h Handlers) GetCurrentUser(r *http.Request) (data.User, error) {
 	}
 
 	return h.DataService.VerifyUserSession(sessionId, token)
+}
+
+func (h Handlers) Pre(handlerFunc http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "TRACE" {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		user, err := h.GetCurrentUser(r)
+		if err != nil {
+			redirectToLogin(w, r)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), "user", user)
+		rWithCtx := r.WithContext(ctx)
+		handlerFunc(w, rWithCtx)
+	}
 }
 
 func redirectToLogin(w http.ResponseWriter, r *http.Request) {

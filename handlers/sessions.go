@@ -6,12 +6,8 @@ import (
 	"net/http"
 )
 
-func (h Handlers) SettingsSessionsHandler(w http.ResponseWriter, r *http.Request) {
-	user, err := h.GetCurrentUser(r)
-	if err != nil {
-		redirectToLogin(w, r)
-		return
-	}
+func (h Handlers) SessionsHandler(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value("user").(data.User)
 
 	sessions, err := h.DataService.GetAllUserSessions(user.Id)
 	if err != nil {

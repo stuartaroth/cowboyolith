@@ -7,6 +7,11 @@ import (
 )
 
 func (h Handlers) EmailRequestHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "TRACE" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
 	userEmail := r.FormValue("email")
 	cookieTokenValue := uuid.NewString()
 
