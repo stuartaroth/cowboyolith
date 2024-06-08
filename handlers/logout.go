@@ -7,5 +7,5 @@ import (
 func (h Handlers) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	clearCookie(w, "cookieSessionId")
 	clearCookie(w, "cookieToken")
-	redirectIfLoggedOut(w, r)
+	redirectToLogin(w, r)
 }

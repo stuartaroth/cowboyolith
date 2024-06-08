@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 	"github.com/stuartaroth/cowboyolith/data"
 	"github.com/stuartaroth/cowboyolith/email"
 	"html/template"
@@ -25,25 +26,17 @@ func NewHandlers(webServerUrl string, dataService data.DataService, emailService
 }
 
 func GetSessionInfo(r *http.Request) (string, string, error) {
-	cookieSessionId, err := r.Cookie("cookieSessionId")
+	cookieSessionIdValue, err := getCookie(r, "cookieSessionId")
 	if err != nil {
 		return "", "", err
 	}
 
-	if cookieSessionId.Value == "" {
-		return "", "", errors.New("empty cookieSessionId")
-	}
-
-	cookieToken, err := r.Cookie("cookieToken")
+	cookieTokenValue, err := getCookie(r, "cookieToken")
 	if err != nil {
 		return "", "", err
 	}
 
-	if cookieToken.Value == "" {
-		return "", "", errors.New("empty cookieToken")
-	}
-
-	return cookieSessionId.Value, cookieToken.Value, nil
+	return cookieSessionIdValue, cookieTokenValue, nil
 }
 
 func (h Handlers) GetCurrentUser(r *http.Request) (data.User, error) {
@@ -55,8 +48,21 @@ func (h Handlers) GetCurrentUser(r *http.Request) (data.User, error) {
 	return h.DataService.VerifyUserSession(sessionId, token)
 }
 
-func redirectIfLoggedOut(w http.ResponseWriter, r *http.Request) {
+func redirectToLogin(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
+func getCookie(r *http.Request, name string) (string, error) {
+	storedCookie, err := r.Cookie(name)
+	if err != nil {
+		return "", err
+	}
+
+	if storedCookie.Value == "" {
+		return "", errors.New(fmt.Sprintf("empty cookie: %v", name))
+	}
+
+	return storedCookie.Value, nil
 }
 
 func setCookie(w http.ResponseWriter, name, value string, maxAge int) {

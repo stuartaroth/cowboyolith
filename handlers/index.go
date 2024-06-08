@@ -8,7 +8,7 @@ import (
 func (h Handlers) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := h.GetCurrentUser(r)
 	if err != nil {
-		redirectIfLoggedOut(w, r)
+		redirectToLogin(w, r)
 		return
 	}
 
