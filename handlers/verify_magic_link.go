@@ -14,10 +14,8 @@ func (h Handlers) VerifyMagicLinkHandler(w http.ResponseWriter, r *http.Request)
 	verifyMagicLinkTemplate := "verify-magic-link"
 	templateData := struct {
 		IsLoggedIn bool
-		IndexUrl   string
 	}{
 		IsLoggedIn: false,
-		IndexUrl:   h.WebServerUrl,
 	}
 
 	queryTokenValue := r.URL.Query().Get("token")

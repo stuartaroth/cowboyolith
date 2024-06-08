@@ -1,0 +1,15 @@
+{{ define "404" }}
+{{ template "html-open" }}
+<body>
+    <div>
+        {{ template "header" }}
+        <main class="container">
+            <div>
+                <h3>404 Not Found</h3>
+                <div><a href='/'>Click here to go home</a></div>
+            </div>
+        </main>
+    </div>
+</body>
+{{ template "html-close" }}
+{{ end }}
