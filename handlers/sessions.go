@@ -1,13 +1,14 @@
 package handlers
 
 import (
+	"github.com/stuartaroth/cowboyolith/constants"
 	"github.com/stuartaroth/cowboyolith/data"
 	"log/slog"
 	"net/http"
 )
 
 func (h Handlers) SessionsHandler(w http.ResponseWriter, r *http.Request) {
-	user := r.Context().Value("user").(data.User)
+	user := r.Context().Value(constants.User).(data.User)
 
 	sessions, err := h.DataService.GetAllUserSessions(user.Id)
 	if err != nil {

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/stuartaroth/cowboyolith/constants"
 	"github.com/stuartaroth/cowboyolith/data"
 	"log/slog"
 	"net/http"
@@ -13,7 +14,7 @@ func (h Handlers) IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := r.Context().Value("user").(data.User)
+	user := r.Context().Value(constants.User).(data.User)
 
 	templateData := struct {
 		Email string

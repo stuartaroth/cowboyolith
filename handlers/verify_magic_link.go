@@ -2,11 +2,12 @@ package handlers
 
 import (
 	"github.com/google/uuid"
+	"github.com/stuartaroth/cowboyolith/constants"
 	"net/http"
 )
 
 func (h Handlers) VerifyMagicLinkHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "TRACE" {
+	if r.Method == http.MethodTrace {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
@@ -25,7 +26,7 @@ func (h Handlers) VerifyMagicLinkHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	pendingCookieToken, err := r.Cookie("pendingCookieToken")
+	pendingCookieToken, err := r.Cookie(constants.PendingCookieToken)
 	if err != nil {
 		h.templates.ExecuteTemplate(w, verifyMagicLinkTemplate, templateData)
 		return
@@ -37,7 +38,7 @@ func (h Handlers) VerifyMagicLinkHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	clearCookie(w, "pendingCookieToken")
+	clearCookie(w, constants.PendingCookieToken)
 
 	pending, err := h.DataService.VerifyPendingUserSession(queryTokenValue, pendingCookieTokenValue)
 	if err != nil {

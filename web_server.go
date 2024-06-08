@@ -73,7 +73,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	myHandlers, err := handlers.NewHandlers(webServerUrl, dataService, emailService, templates)
+	myHandlers, err := handlers.NewHandlers(dataService, emailService, templates)
 	if err != nil {
 		slog.Error("handlers.NewHandlers", err)
 		os.Exit(1)

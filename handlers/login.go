@@ -6,7 +6,7 @@ import (
 )
 
 func (h Handlers) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "TRACE" {
+	if r.Method == http.MethodTrace {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}

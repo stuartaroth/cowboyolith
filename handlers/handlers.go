@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/stuartaroth/cowboyolith/constants"
 	"github.com/stuartaroth/cowboyolith/data"
 	"github.com/stuartaroth/cowboyolith/email"
 	"html/template"
@@ -11,15 +12,13 @@ import (
 )
 
 type Handlers struct {
-	WebServerUrl string
 	DataService  data.DataService
 	EmailService email.EmailService
 	templates    *template.Template
 }
 
-func NewHandlers(webServerUrl string, dataService data.DataService, emailService email.EmailService, templates *template.Template) (Handlers, error) {
+func NewHandlers(dataService data.DataService, emailService email.EmailService, templates *template.Template) (Handlers, error) {
 	return Handlers{
-		WebServerUrl: webServerUrl,
 		DataService:  dataService,
 		EmailService: emailService,
 		templates:    templates,
@@ -62,7 +61,7 @@ func (h Handlers) Pre(handlerFunc http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "user", user)
+		ctx := context.WithValue(r.Context(), constants.User, user)
 		rWithCtx := r.WithContext(ctx)
 		handlerFunc(w, rWithCtx)
 	}

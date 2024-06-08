@@ -2,20 +2,21 @@ package handlers
 
 import (
 	"github.com/google/uuid"
+	"github.com/stuartaroth/cowboyolith/constants"
 	"log/slog"
 	"net/http"
 )
 
 func (h Handlers) EmailRequestHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "TRACE" {
+	if r.Method == http.MethodTrace {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
-	userEmail := r.FormValue("email")
+	userEmail := r.FormValue(constants.Email)
 	cookieTokenValue := uuid.NewString()
 
-	setCookie(w, "pendingCookieToken", cookieTokenValue, 120)
+	setCookie(w, constants.PendingCookieToken, cookieTokenValue, 120)
 
 	h.createPendingUserSessionAndEmail(r, userEmail, cookieTokenValue)
 
