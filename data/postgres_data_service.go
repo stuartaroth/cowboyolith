@@ -139,6 +139,24 @@ func (p postgresDataService) GetUserByEmail(email string) (User, error) {
 	return u, nil
 }
 
+func (p postgresDataService) GetUserById(id string) (User, error) {
+	var u User
+	rows, err := p.db.Query("select id, email, is_admin, inserted_at from users where id = $1;", id)
+	if err != nil {
+		return u, err
+	}
+
+	for rows.Next() {
+
+		u, err = ScanUser(rows)
+		if err != nil {
+			return u, err
+		}
+	}
+
+	return u, nil
+}
+
 func (p postgresDataService) DeletePendingUserSession(id string) error {
 	_, err := p.db.Exec("delete from pending_user_sessions where id = $1", id)
 	if err != nil {
@@ -146,6 +164,40 @@ func (p postgresDataService) DeletePendingUserSession(id string) error {
 	}
 
 	return err
+}
+
+func (p postgresDataService) VerifyUserSession(id, token string) (User, error) {
+	var user User
+	var userSession UserSession
+	query :=
+		`select 
+		    id, user_id, hashed_cookie_token, salt, inserted_at
+		from user_sessions 
+			where id = $1
+		limit 1;`
+
+	rows, err := p.db.Query(query, id)
+	if err != nil {
+		return user, err
+	}
+
+	for rows.Next() {
+		userSession, err = ScanUserSession(rows)
+		if err != nil {
+			return user, err
+		}
+	}
+
+	if userSession.Id == "" {
+		return user, errors.New("no result")
+	}
+
+	err = compareHash(userSession.HashedCookieToken, token, userSession.Salt)
+	if err != nil {
+		return user, err
+	}
+
+	return p.GetUserById(userSession.UserId)
 }
 
 func ScanUser(rows *sql.Rows) (User, error) {
@@ -161,6 +213,16 @@ func ScanUser(rows *sql.Rows) (User, error) {
 func ScanPendingUserSession(rows *sql.Rows) (PendingUserSession, error) {
 	var u PendingUserSession
 	err := rows.Scan(&u.Id, &u.UserId, &u.HashedCookieToken, &u.Salt, &u.IpAddress, &u.UserAgent, &u.InsertedAt)
+	if err != nil {
+		return u, err
+	}
+
+	return u, nil
+}
+
+func ScanUserSession(rows *sql.Rows) (UserSession, error) {
+	var u UserSession
+	err := rows.Scan(&u.Id, &u.UserId, &u.HashedCookieToken, &u.Salt, &u.InsertedAt)
 	if err != nil {
 		return u, err
 	}

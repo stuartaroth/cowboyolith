@@ -3,47 +3,12 @@
 <body>
     <div>
         {{ template "header" }}
-        {{ if .IsLoggedIn }}
+        <main class="container">
             <div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th scope="col">Id</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Role</th>
-                            <th scope="col">Inserted At</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {{ range .Users }}
-                        <tr>
-                            <td>{{ .Id }}</td>
-                            <td>{{ .Email }}</td>
-                            <td>{{ .Role }}</td>
-                            <td>{{ .InsertedAt }}</td>
-                        </tr>
-                    {{ end }}
-                    </tbody>
-                </table>
+                Welcome {{ .Email }}
+                <div><a href="/logout">Logout</a></div>
             </div>
-        {{ else }}
-            <main class="container">
-                <div>
-                    <form action="/email-request" method="POST">
-                        <fieldset>
-                            <label>
-                                login
-                                <input type="email"
-                                       name="email"
-                                       placeholder="email"
-                                       autocomplete="email" />
-                            </label>
-                        </fieldset>
-                        <input type="submit"/>
-                    </form>
-                </div>
-            </main>
-        {{end}}
+        </main>
     </div>
 </body>
 {{ template "html-close" }}

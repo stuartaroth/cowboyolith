@@ -10,16 +10,7 @@ func (h Handlers) EmailRequestHandler(w http.ResponseWriter, r *http.Request) {
 	userEmail := r.FormValue("email")
 	cookieTokenValue := uuid.NewString()
 
-	cookieToken := http.Cookie{
-		Name:     "pendingCookieToken",
-		Value:    cookieTokenValue,
-		Secure:   true,
-		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
-		MaxAge:   120, // seconds
-	}
-
-	http.SetCookie(w, &cookieToken)
+	setCookie(w, "pendingCookieToken", cookieTokenValue, 120)
 
 	h.createPendingUserSessionAndEmail(r, userEmail, cookieTokenValue)
 

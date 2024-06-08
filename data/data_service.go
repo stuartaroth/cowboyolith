@@ -7,4 +7,6 @@ type DataService interface {
 	CreateUserSession(userId, id, cookieTokenValue string) error
 	GetUserByEmail(email string) (User, error)
 	DeletePendingUserSession(id string) error
+	VerifyUserSession(id, token string) (User, error)
+	GetUserById(id string) (User, error)
 }

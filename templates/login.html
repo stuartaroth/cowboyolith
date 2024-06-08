@@ -1,0 +1,25 @@
+{{ define "login" }}
+{{ template "html-open" }}
+<body>
+    <div>
+        {{ template "header" }}
+        <main class="container">
+            <div>
+                <form action="/email-request" method="POST">
+                    <fieldset>
+                        <label>
+                            login
+                            <input type="email"
+                                   name="email"
+                                   placeholder="email"
+                                   autocomplete="email" />
+                        </label>
+                    </fieldset>
+                    <input type="submit"/>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+{{ template "html-close" }}
+{{ end }}

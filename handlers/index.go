@@ -1,23 +1,21 @@
 package handlers
 
 import (
-	"github.com/stuartaroth/cowboyolith/data"
 	"log/slog"
 	"net/http"
 )
 
 func (h Handlers) IndexHandler(w http.ResponseWriter, r *http.Request) {
-	users, err := h.DataService.GetAllUsers()
+	user, err := h.GetCurrentUser(r)
 	if err != nil {
-		users = []data.User{}
+		redirectIfLoggedOut(w, r)
+		return
 	}
 
 	templateData := struct {
-		Users      []data.User
-		IsLoggedIn bool
+		Email string
 	}{
-		Users:      users,
-		IsLoggedIn: false,
+		Email: user.Email,
 	}
 
 	err = h.templates.ExecuteTemplate(w, "index", templateData)

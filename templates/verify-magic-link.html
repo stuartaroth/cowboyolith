@@ -5,10 +5,11 @@
         {{ template "header" }}
         <main class="container">
             {{ if .IsLoggedIn }}
-                <div>yeah boi</div>
+                <div>Successful login</div>
             {{ else }}
-                <div>get fucked</div>
+                <div>Something went wrong</div>
             {{ end }}
+            <div><a href='{{ .IndexUrl }}'>Click here to go home</a></div>
         </main>
     </div>
 </body>
