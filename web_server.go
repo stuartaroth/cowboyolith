@@ -13,6 +13,39 @@ import (
 	"strings"
 )
 
+func getWebServerConfig() (string, string, string, string, error) {
+	configErrors := []string{}
+
+	webServerUrl := os.Getenv("WEB_SERVER_URL")
+	if webServerUrl == "" {
+		configErrors = append(configErrors, "WEB_SERVER_URL")
+	}
+
+	webServerPort := os.Getenv("WEB_SERVER_PORT")
+	if webServerPort == "" {
+		configErrors = append(configErrors, "WEB_SERVER_PORT")
+	}
+
+	webServerCertFile := os.Getenv("WEB_SERVER_CERT_FILE")
+	if webServerCertFile == "" {
+		configErrors = append(configErrors, "WEB_SERVER_CERT_FILE")
+	}
+
+	webServerKeyFile := os.Getenv("WEB_SERVER_KEY_FILE")
+	if webServerKeyFile == "" {
+		configErrors = append(configErrors, "WEB_SERVER_KEY_FILE")
+	}
+
+	var err error
+
+	if len(configErrors) != 0 {
+		missingEnvVariables := strings.Join(configErrors, ",")
+		err = errors.New(fmt.Sprintf("following variables not set (%v)", missingEnvVariables))
+	}
+
+	return webServerUrl, webServerPort, webServerCertFile, webServerKeyFile, err
+}
+
 func main() {
 	slogger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(slogger)
@@ -51,6 +84,7 @@ func main() {
 	http.HandleFunc("/logout", myHandlers.LogoutHandler)
 	http.HandleFunc("POST /email-request", myHandlers.EmailRequestHandler)
 	http.HandleFunc("/verify-magic-link", myHandlers.VerifyMagicLinkHandler)
+	http.HandleFunc("/sessions", myHandlers.SettingsSessionsHandler)
 
 	slog.Info(fmt.Sprintf("%v see you, space cowboy", webServerUrl))
 	err = http.ListenAndServeTLS(fmt.Sprintf(":%v", webServerPort), webServerCertFile, webServerKeyFile, nil)
@@ -58,37 +92,4 @@ func main() {
 		slog.Error("http.ListenAndServe", err)
 		os.Exit(1)
 	}
-}
-
-func getWebServerConfig() (string, string, string, string, error) {
-	configErrors := []string{}
-
-	webServerUrl := os.Getenv("WEB_SERVER_URL")
-	if webServerUrl == "" {
-		configErrors = append(configErrors, "WEB_SERVER_URL")
-	}
-
-	webServerPort := os.Getenv("WEB_SERVER_PORT")
-	if webServerPort == "" {
-		configErrors = append(configErrors, "WEB_SERVER_PORT")
-	}
-
-	webServerCertFile := os.Getenv("WEB_SERVER_CERT_FILE")
-	if webServerCertFile == "" {
-		configErrors = append(configErrors, "WEB_SERVER_CERT_FILE")
-	}
-
-	webServerKeyFile := os.Getenv("WEB_SERVER_KEY_FILE")
-	if webServerKeyFile == "" {
-		configErrors = append(configErrors, "WEB_SERVER_KEY_FILE")
-	}
-
-	var err error
-
-	if len(configErrors) != 0 {
-		missingEnvVariables := strings.Join(configErrors, ",")
-		err = errors.New(fmt.Sprintf("following variables not set (%v)", missingEnvVariables))
-	}
-
-	return webServerUrl, webServerPort, webServerCertFile, webServerKeyFile, err
 }

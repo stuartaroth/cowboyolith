@@ -1,0 +1,31 @@
+{{ define "sessions" }}
+{{ template "html-open" }}
+<body>
+    <div>
+        {{ template "header" }}
+        <main class="container">
+            <div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">UserAgent</th>
+                        <th scope="col">Inserted At (UTC)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{ range .Sessions }}
+                    <tr>
+                        <td>{{ .Id }}</td>
+                        <td>{{ .UserAgent }}</td>
+                        <td>{{ .InsertedAt }}</td>
+                    </tr>
+                    {{ end }}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+{{ template "html-close" }}
+{{ end }}

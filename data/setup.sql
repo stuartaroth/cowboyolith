@@ -22,6 +22,7 @@ create table user_sessions (
     user_id uuid not null references users,
     hashed_cookie_token text not null,
     salt text not null,
+    user_agent text not null,
     inserted_at timestamp default (timezone('utc', now()))
 );
 

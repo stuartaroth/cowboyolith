@@ -51,7 +51,7 @@ func (h Handlers) VerifyMagicLinkHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err = h.DataService.CreateUserSession(pending.UserId, sessionIdValue, cookieTokenValue)
+	err = h.DataService.CreateUserSession(pending.UserId, sessionIdValue, cookieTokenValue, pending.UserAgent)
 	if err != nil {
 		h.templates.ExecuteTemplate(w, verifyMagicLinkTemplate, templateData)
 		return

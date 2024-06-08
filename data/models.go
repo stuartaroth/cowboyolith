@@ -22,6 +22,7 @@ type UserSession struct {
 	UserId            string
 	HashedCookieToken string
 	Salt              string
+	UserAgent         string
 	InsertedAt        string
 }
 

@@ -105,7 +105,7 @@ func (p postgresDataService) VerifyPendingUserSession(id, cookieTokenValue strin
 	return u, nil
 }
 
-func (p postgresDataService) CreateUserSession(userId, id, cookieTokenValue string) error {
+func (p postgresDataService) CreateUserSession(userId, id, cookieTokenValue, userAgent string) error {
 	salt := uuid.NewString()
 	hashedCookieTokenValue, err := hash(cookieTokenValue, salt)
 	if err != nil {
@@ -113,7 +113,7 @@ func (p postgresDataService) CreateUserSession(userId, id, cookieTokenValue stri
 		return err
 	}
 
-	_, err = p.db.Exec("insert into user_sessions (id, user_id, hashed_cookie_token, salt) values ($1, $2, $3, $4);", id, userId, hashedCookieTokenValue, salt)
+	_, err = p.db.Exec("insert into user_sessions (id, user_id, hashed_cookie_token, salt, user_agent) values ($1, $2, $3, $4, $5);", id, userId, hashedCookieTokenValue, salt, userAgent)
 	if err != nil {
 		return err
 	}
@@ -171,7 +171,7 @@ func (p postgresDataService) VerifyUserSession(id, token string) (User, error) {
 	var userSession UserSession
 	query :=
 		`select 
-		    id, user_id, hashed_cookie_token, salt, inserted_at
+		    id, user_id, hashed_cookie_token, salt, user_agent, inserted_at
 		from user_sessions 
 			where id = $1
 		limit 1;`
@@ -200,6 +200,41 @@ func (p postgresDataService) VerifyUserSession(id, token string) (User, error) {
 	return p.GetUserById(userSession.UserId)
 }
 
+func (p postgresDataService) GetAllUserSessions(userId string) ([]UserSession, error) {
+	sessions := make([]UserSession, 0)
+
+	query :=
+		`select
+		    id, user_id, hashed_cookie_token, salt, user_agent, inserted_at
+		from user_sessions
+			where user_id = $1;`
+
+	rows, err := p.db.Query(query, userId)
+	if err != nil {
+		return sessions, err
+	}
+
+	for rows.Next() {
+		userSession, err := ScanUserSession(rows)
+		if err != nil {
+			return sessions, err
+		}
+
+		sessions = append(sessions, userSession)
+	}
+
+	return sessions, nil
+}
+
+func (p postgresDataService) DeleteUserSession(sessionId string) error {
+	_, err := p.db.Exec("delete from user_sessions where id = $1", sessionId)
+	if err != nil {
+		slog.Error("DeleteUserSession", err)
+	}
+
+	return err
+}
+
 func ScanUser(rows *sql.Rows) (User, error) {
 	var u User
 	err := rows.Scan(&u.Id, &u.Email, &u.IsAdmin, &u.InsertedAt)
@@ -222,7 +257,7 @@ func ScanPendingUserSession(rows *sql.Rows) (PendingUserSession, error) {
 
 func ScanUserSession(rows *sql.Rows) (UserSession, error) {
 	var u UserSession
-	err := rows.Scan(&u.Id, &u.UserId, &u.HashedCookieToken, &u.Salt, &u.InsertedAt)
+	err := rows.Scan(&u.Id, &u.UserId, &u.HashedCookieToken, &u.Salt, &u.UserAgent, &u.InsertedAt)
 	if err != nil {
 		return u, err
 	}
