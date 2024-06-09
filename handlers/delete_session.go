@@ -7,18 +7,14 @@ import (
 	"net/http"
 )
 
-func (h Handlers) LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodTrace {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
+func (h Handlers) DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value(constants.User).(data.User)
-	sessionId := r.Context().Value(constants.SessionId).(string)
+	sessionId := r.PathValue("id")
+
 	err := h.DataService.DeleteUserSession(user.Id, sessionId)
 	if err != nil {
 		slog.Error("error in logout handler", err)
 	}
 
-	redirectToLogin(w, r)
+	http.Redirect(w, r, "/sessions", http.StatusSeeOther)
 }

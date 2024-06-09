@@ -9,8 +9,7 @@ import (
 
 func (h Handlers) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		h.templates.ExecuteTemplate(w, "404", nil)
-		w.WriteHeader(http.StatusNotFound)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 

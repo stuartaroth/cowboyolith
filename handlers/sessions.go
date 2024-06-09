@@ -9,6 +9,7 @@ import (
 
 func (h Handlers) SessionsHandler(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value(constants.User).(data.User)
+	sessionId := r.Context().Value(constants.SessionId).(string)
 
 	sessions, err := h.DataService.GetAllUserSessions(user.Id)
 	if err != nil {
@@ -16,9 +17,11 @@ func (h Handlers) SessionsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	templateData := struct {
-		Sessions []data.UserSession
+		Sessions  []data.UserSession
+		SessionId string
 	}{
-		Sessions: sessions,
+		Sessions:  sessions,
+		SessionId: sessionId,
 	}
 
 	err = h.templates.ExecuteTemplate(w, "sessions", templateData)

@@ -10,5 +10,5 @@ type DataService interface {
 	VerifyUserSession(id, token string) (User, error)
 	GetUserById(id string) (User, error)
 	GetAllUserSessions(userId string) ([]UserSession, error)
-	DeleteUserSession(sessionId string) error
+	DeleteUserSession(userId, sessionId string) error
 }

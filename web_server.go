@@ -79,15 +79,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	// login and logout functions
+	// login functions
 	http.HandleFunc("/login", myHandlers.LoginHandler)
-	http.HandleFunc("/logout", myHandlers.LogoutHandler)
+
 	http.HandleFunc("POST /email-request", myHandlers.EmailRequestHandler)
 	http.HandleFunc("/verify-magic-link", myHandlers.VerifyMagicLinkHandler)
 
 	// all logged in can use myHandlers.Pre
 	http.HandleFunc("/", myHandlers.Pre(myHandlers.IndexHandler))
+	http.HandleFunc("/logout", myHandlers.Pre(myHandlers.LogoutHandler))
 	http.HandleFunc("/sessions", myHandlers.Pre(myHandlers.SessionsHandler))
+	http.HandleFunc("POST /sessions/{id}/delete", myHandlers.Pre(myHandlers.DeleteSessionHandler))
 
 	slog.Info(fmt.Sprintf("%v see you, space cowboy", webServerUrl))
 	err = http.ListenAndServeTLS(fmt.Sprintf(":%v", webServerPort), webServerCertFile, webServerKeyFile, nil)

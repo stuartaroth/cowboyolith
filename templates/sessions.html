@@ -11,14 +11,27 @@
                         <th scope="col">Id</th>
                         <th scope="col">UserAgent</th>
                         <th scope="col">Inserted At (UTC)</th>
+                        <th scope="col">Current Session</th>
+                        <th scope="col">Delete Session</th>
                     </tr>
                     </thead>
                     <tbody>
+                    {{ $sessionId := .SessionId }}
                     {{ range .Sessions }}
                     <tr>
                         <td>{{ .Id }}</td>
                         <td>{{ .UserAgent }}</td>
                         <td>{{ .InsertedAt }}</td>
+                        <td>
+                            {{ if eq $sessionId .Id }}
+                            ✅
+                            {{ end }}
+                        </td>
+                        <td>
+                            <form action="/sessions/{{ .Id }}/delete" method="POST">
+                                <input type="submit" value="delete"/>
+                            </form>
+                        </td>
                     </tr>
                     {{ end }}
                     </tbody>

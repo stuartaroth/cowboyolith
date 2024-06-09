@@ -226,8 +226,8 @@ func (p postgresDataService) GetAllUserSessions(userId string) ([]UserSession, e
 	return sessions, nil
 }
 
-func (p postgresDataService) DeleteUserSession(sessionId string) error {
-	_, err := p.db.Exec("delete from user_sessions where id = $1", sessionId)
+func (p postgresDataService) DeleteUserSession(userId, sessionId string) error {
+	_, err := p.db.Exec("delete from user_sessions where id = $1 and user_id = $2", sessionId, userId)
 	if err != nil {
 		slog.Error("DeleteUserSession", err)
 	}

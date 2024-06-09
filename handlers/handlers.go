@@ -39,13 +39,18 @@ func GetSessionInfo(r *http.Request) (string, string, error) {
 	return cookieSessionIdValue, cookieTokenValue, nil
 }
 
-func (h Handlers) GetCurrentUser(r *http.Request) (data.User, error) {
+func (h Handlers) GetCurrentUserAndSession(r *http.Request) (data.User, string, error) {
 	sessionId, token, err := GetSessionInfo(r)
 	if err != nil {
-		return data.User{}, err
+		return data.User{}, "", err
 	}
 
-	return h.DataService.VerifyUserSession(sessionId, token)
+	user, err := h.DataService.VerifyUserSession(sessionId, token)
+	if err != nil {
+		return data.User{}, "", err
+	}
+
+	return user, sessionId, nil
 }
 
 func (h Handlers) Pre(handlerFunc http.HandlerFunc) http.HandlerFunc {
@@ -55,19 +60,22 @@ func (h Handlers) Pre(handlerFunc http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		user, err := h.GetCurrentUser(r)
+		user, sessionId, err := h.GetCurrentUserAndSession(r)
 		if err != nil {
 			redirectToLogin(w, r)
 			return
 		}
 
 		ctx := context.WithValue(r.Context(), constants.User, user)
+		ctx = context.WithValue(ctx, constants.SessionId, sessionId)
 		rWithCtx := r.WithContext(ctx)
 		handlerFunc(w, rWithCtx)
 	}
 }
 
 func redirectToLogin(w http.ResponseWriter, r *http.Request) {
+	clearCookie(w, "cookieSessionId")
+	clearCookie(w, "cookieToken")
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
