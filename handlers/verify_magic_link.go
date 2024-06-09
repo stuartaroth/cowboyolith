@@ -61,8 +61,8 @@ func (h Handlers) VerifyMagicLinkHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	setCookie(w, "cookieSessionId", sessionIdValue, 300)
-	setCookie(w, "cookieToken", cookieTokenValue, 300)
+	setCookie(w, constants.CookieSessionId, sessionIdValue, constants.OneWeekInSeconds)
+	setCookie(w, constants.CookieToken, cookieTokenValue, constants.OneWeekInSeconds)
 
 	templateData.IsLoggedIn = true
 	h.templates.ExecuteTemplate(w, verifyMagicLinkTemplate, templateData)

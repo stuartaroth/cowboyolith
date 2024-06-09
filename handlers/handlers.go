@@ -26,12 +26,12 @@ func NewHandlers(dataService data.DataService, emailService email.EmailService, 
 }
 
 func GetSessionInfo(r *http.Request) (string, string, error) {
-	cookieSessionIdValue, err := getCookie(r, "cookieSessionId")
+	cookieSessionIdValue, err := getCookie(r, constants.CookieSessionId)
 	if err != nil {
 		return "", "", err
 	}
 
-	cookieTokenValue, err := getCookie(r, "cookieToken")
+	cookieTokenValue, err := getCookie(r, constants.CookieToken)
 	if err != nil {
 		return "", "", err
 	}
@@ -74,8 +74,8 @@ func (h Handlers) Pre(handlerFunc http.HandlerFunc) http.HandlerFunc {
 }
 
 func redirectToLogin(w http.ResponseWriter, r *http.Request) {
-	clearCookie(w, "cookieSessionId")
-	clearCookie(w, "cookieToken")
+	clearCookie(w, constants.CookieSessionId)
+	clearCookie(w, constants.CookieToken)
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
