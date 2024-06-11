@@ -15,14 +15,43 @@ type postgresDataService struct {
 	db *sql.DB
 }
 
-func NewPostgresDataService() (DataService, error) {
-	host := os.Getenv("POSTGRES_HOST")
-	port := os.Getenv("POSTGRES_PORT")
-	dbname := os.Getenv("POSTGRES_DATABASE")
-	user := os.Getenv("POSTGRES_USER")
-	password := os.Getenv("POSTGRES_PASSWORD")
-	sslmode := os.Getenv("POSTGRES_SSL_MODE")
+func GetDataServiceConfig() (string, string, string, string, string, string, error) {
+	configErrors := []string{}
 
+	host := os.Getenv("POSTGRES_HOST")
+	if host == "" {
+		configErrors = append(configErrors, "POSTGRES_HOST")
+	}
+
+	port := os.Getenv("POSTGRES_PORT")
+	if port == "" {
+		configErrors = append(configErrors, "POSTGRES_PORT")
+	}
+
+	dbname := os.Getenv("POSTGRES_DATABASE")
+	if dbname == "" {
+		configErrors = append(configErrors, "POSTGRES_DATABASE")
+	}
+
+	user := os.Getenv("POSTGRES_USER")
+	if user == "" {
+		configErrors = append(configErrors, "POSTGRES_USER")
+	}
+
+	password := os.Getenv("POSTGRES_PASSWORD")
+	if password == "" {
+		configErrors = append(configErrors, "POSTGRES_PASSWORD")
+	}
+
+	sslmode := os.Getenv("POSTGRES_SSL_MODE")
+	if sslmode == "" {
+		configErrors = append(configErrors, "POSTGRES_SSL_MODE")
+	}
+
+	return host, port, dbname, user, password, sslmode, nil
+}
+
+func NewPostgresDataService(host, port, dbname, user, password, sslmode string) (DataService, error) {
 	connectionString := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s", host, port, dbname, user, password, sslmode)
 
 	db, err := sql.Open("postgres", connectionString)
@@ -54,6 +83,15 @@ func (p postgresDataService) GetAllUsers() ([]User, error) {
 	}
 
 	return users, nil
+}
+
+func (p postgresDataService) CreateUser(id, email string, isAdmin bool) error {
+	_, err := p.db.Exec("insert into users (id, email, is_admin) values ($1, $2, $3);", id, email, isAdmin)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p postgresDataService) CreatePendingUserSession(userId, id, cookieTokenValue, ipAddress, userAgent string) error {

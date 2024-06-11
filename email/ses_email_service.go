@@ -14,24 +14,30 @@ type sesEmailService struct {
 	webServerUrl string
 	emailClient  *ses.Client
 	templates    *template.Template
+	sendEmails   bool
 }
 
-func NewSesEmailService(webServerUrl string, templates *template.Template) (EmailService, error) {
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-	if err != nil {
-		return sesEmailService{}, err
-	}
+func NewSesEmailService(webServerUrl string, templates *template.Template, sendEmails bool) (EmailService, error) {
+	var emailClient *ses.Client
 
-	emailClient := ses.NewFromConfig(cfg)
+	if sendEmails {
+		cfg, err := config.LoadDefaultConfig(context.TODO())
+		if err != nil {
+			return sesEmailService{}, err
+		}
+
+		emailClient = ses.NewFromConfig(cfg)
+	}
 
 	return sesEmailService{
 		webServerUrl: webServerUrl,
 		emailClient:  emailClient,
 		templates:    templates,
+		sendEmails:   sendEmails,
 	}, nil
 }
 
-func (s sesEmailService) SendMagicLink(email, queryToken string) error {
+func (s sesEmailService) SendMagicLink(email, queryToken string) (string, error) {
 	emailDestination := types.Destination{
 		BccAddresses: []string{},
 		CcAddresses:  []string{},
@@ -51,7 +57,7 @@ func (s sesEmailService) SendMagicLink(email, queryToken string) error {
 	bits := new(bytes.Buffer)
 	err := s.templates.ExecuteTemplate(bits, "magic-link-email", templateData)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	htmlString := bits.String()
@@ -87,10 +93,12 @@ func (s sesEmailService) SendMagicLink(email, queryToken string) error {
 		ReturnPath:  &sendingEmailAddress,
 	}
 
-	_, err = s.emailClient.SendEmail(context.TODO(), &sendMailInput)
-	if err != nil {
-		return err
+	if s.sendEmails {
+		_, err = s.emailClient.SendEmail(context.TODO(), &sendMailInput)
+		if err != nil {
+			return "", err
+		}
 	}
 
-	return nil
+	return htmlString, nil
 }

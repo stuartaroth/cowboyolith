@@ -10,6 +10,8 @@ export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=password
 export POSTGRES_SSL_MODE=disable
 
+export SEND_EMAILS=true
+
 export AWS_ACCESS_KEY_ID=yourkeyhere
 export AWS_SECRET_ACCESS_KEY=yourkeyhere
 export AWS_DEFAULT_REGION=us-west-1
