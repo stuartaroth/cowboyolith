@@ -12,29 +12,22 @@ func (h Handlers) VerifyMagicLinkHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	verifyMagicLinkTemplate := "verify-magic-link"
-	templateData := struct {
-		IsLoggedIn bool
-	}{
-		IsLoggedIn: false,
-	}
-
 	queryTokenValue := r.URL.Query().Get("token")
 
 	if queryTokenValue == "" {
-		h.templates.ExecuteTemplate(w, verifyMagicLinkTemplate, templateData)
+		redirectToIndex(w, r)
 		return
 	}
 
 	pendingCookieToken, err := r.Cookie(constants.PendingCookieToken)
 	if err != nil {
-		h.templates.ExecuteTemplate(w, verifyMagicLinkTemplate, templateData)
+		redirectToIndex(w, r)
 		return
 	}
 
 	pendingCookieTokenValue := pendingCookieToken.Value
 	if pendingCookieTokenValue == "" {
-		h.templates.ExecuteTemplate(w, verifyMagicLinkTemplate, templateData)
+		redirectToIndex(w, r)
 		return
 	}
 
@@ -42,7 +35,7 @@ func (h Handlers) VerifyMagicLinkHandler(w http.ResponseWriter, r *http.Request)
 
 	pending, err := h.DataService.VerifyPendingUserSession(queryTokenValue, pendingCookieTokenValue)
 	if err != nil {
-		h.templates.ExecuteTemplate(w, verifyMagicLinkTemplate, templateData)
+		redirectToIndex(w, r)
 		return
 	}
 
@@ -51,19 +44,17 @@ func (h Handlers) VerifyMagicLinkHandler(w http.ResponseWriter, r *http.Request)
 
 	err = h.DataService.DeletePendingUserSession(pending.Id)
 	if err != nil {
-		h.templates.ExecuteTemplate(w, verifyMagicLinkTemplate, templateData)
+		redirectToIndex(w, r)
 		return
 	}
 
 	err = h.DataService.CreateUserSession(pending.UserId, sessionIdValue, cookieTokenValue, pending.UserAgent)
 	if err != nil {
-		h.templates.ExecuteTemplate(w, verifyMagicLinkTemplate, templateData)
+		redirectToIndex(w, r)
 		return
 	}
 
 	setCookie(w, constants.CookieSessionId, sessionIdValue, constants.OneWeekInSeconds)
 	setCookie(w, constants.CookieToken, cookieTokenValue, constants.OneWeekInSeconds)
-
-	templateData.IsLoggedIn = true
-	h.templates.ExecuteTemplate(w, verifyMagicLinkTemplate, templateData)
+	redirectToIndex(w, r)
 }

@@ -9,7 +9,7 @@ import (
 
 func (h Handlers) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirectToIndex(w, r)
 		return
 	}
 

@@ -79,6 +79,10 @@ func redirectToLogin(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
+func redirectToIndex(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 func getCookie(r *http.Request, name string) (string, error) {
 	storedCookie, err := r.Cookie(name)
 	if err != nil {
