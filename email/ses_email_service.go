@@ -10,26 +10,26 @@ import (
 	"html/template"
 )
 
-type sesEmailService struct {
+type SesEmailService struct {
 	webServerUrl string
 	emailClient  *ses.Client
 	templates    *template.Template
 	sendEmails   bool
 }
 
-func NewSesEmailService(webServerUrl string, templates *template.Template, sendEmails bool) (EmailService, error) {
+func NewSesEmailService(webServerUrl string, templates *template.Template, sendEmails bool) (SesEmailService, error) {
 	var emailClient *ses.Client
 
 	if sendEmails {
 		cfg, err := config.LoadDefaultConfig(context.TODO())
 		if err != nil {
-			return sesEmailService{}, err
+			return SesEmailService{}, err
 		}
 
 		emailClient = ses.NewFromConfig(cfg)
 	}
 
-	return sesEmailService{
+	return SesEmailService{
 		webServerUrl: webServerUrl,
 		emailClient:  emailClient,
 		templates:    templates,
@@ -37,7 +37,7 @@ func NewSesEmailService(webServerUrl string, templates *template.Template, sendE
 	}, nil
 }
 
-func (s sesEmailService) SendMagicLink(email, queryToken string) (string, error) {
+func (s SesEmailService) SendMagicLink(email, queryToken string) (string, error) {
 	emailDestination := types.Destination{
 		BccAddresses: []string{},
 		CcAddresses:  []string{},

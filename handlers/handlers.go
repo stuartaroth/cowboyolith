@@ -12,12 +12,12 @@ import (
 )
 
 type Handlers struct {
-	DataService  data.DataService
-	EmailService email.EmailService
+	DataService  data.PostgresDataService
+	EmailService email.SesEmailService
 	templates    *template.Template
 }
 
-func NewHandlers(dataService data.DataService, emailService email.EmailService, templates *template.Template) (Handlers, error) {
+func NewHandlers(dataService data.PostgresDataService, emailService email.SesEmailService, templates *template.Template) (Handlers, error) {
 	return Handlers{
 		DataService:  dataService,
 		EmailService: emailService,

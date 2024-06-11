@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-type postgresDataService struct {
+type PostgresDataService struct {
 	db *sql.DB
 }
 
@@ -51,20 +51,20 @@ func GetDataServiceConfig() (string, string, string, string, string, string, err
 	return host, port, dbname, user, password, sslmode, nil
 }
 
-func NewPostgresDataService(host, port, dbname, user, password, sslmode string) (DataService, error) {
+func NewPostgresDataService(host, port, dbname, user, password, sslmode string) (PostgresDataService, error) {
 	connectionString := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s", host, port, dbname, user, password, sslmode)
 
 	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
-		return nil, err
+		return PostgresDataService{}, err
 	}
 
-	return postgresDataService{
+	return PostgresDataService{
 		db: db,
 	}, nil
 }
 
-func (p postgresDataService) GetAllUsers() ([]User, error) {
+func (p PostgresDataService) GetAllUsers() ([]User, error) {
 	emptyUsers := make([]User, 0)
 	users := make([]User, 0)
 
@@ -85,7 +85,7 @@ func (p postgresDataService) GetAllUsers() ([]User, error) {
 	return users, nil
 }
 
-func (p postgresDataService) CreateUser(id, email string, isAdmin bool) error {
+func (p PostgresDataService) CreateUser(id, email string, isAdmin bool) error {
 	_, err := p.db.Exec("insert into users (id, email, is_admin) values ($1, $2, $3);", id, email, isAdmin)
 	if err != nil {
 		return err
@@ -94,7 +94,7 @@ func (p postgresDataService) CreateUser(id, email string, isAdmin bool) error {
 	return nil
 }
 
-func (p postgresDataService) CreatePendingUserSession(userId, id, cookieTokenValue, ipAddress, userAgent string) error {
+func (p PostgresDataService) CreatePendingUserSession(userId, id, cookieTokenValue, ipAddress, userAgent string) error {
 	salt := uuid.NewString()
 	hashedCookieTokenValue, err := hash(cookieTokenValue, salt)
 	if err != nil {
@@ -109,7 +109,7 @@ func (p postgresDataService) CreatePendingUserSession(userId, id, cookieTokenVal
 	return nil
 }
 
-func (p postgresDataService) VerifyPendingUserSession(id, cookieTokenValue string) (PendingUserSession, error) {
+func (p PostgresDataService) VerifyPendingUserSession(id, cookieTokenValue string) (PendingUserSession, error) {
 	var u PendingUserSession
 	query :=
 		`select 
@@ -143,7 +143,7 @@ func (p postgresDataService) VerifyPendingUserSession(id, cookieTokenValue strin
 	return u, nil
 }
 
-func (p postgresDataService) CreateUserSession(userId, id, cookieTokenValue, userAgent string) error {
+func (p PostgresDataService) CreateUserSession(userId, id, cookieTokenValue, userAgent string) error {
 	salt := uuid.NewString()
 	hashedCookieTokenValue, err := hash(cookieTokenValue, salt)
 	if err != nil {
@@ -159,7 +159,7 @@ func (p postgresDataService) CreateUserSession(userId, id, cookieTokenValue, use
 	return nil
 }
 
-func (p postgresDataService) GetUserByEmail(email string) (User, error) {
+func (p PostgresDataService) GetUserByEmail(email string) (User, error) {
 	var u User
 	rows, err := p.db.Query("select id, email, is_admin, inserted_at from users where email = $1;", email)
 	if err != nil {
@@ -177,7 +177,7 @@ func (p postgresDataService) GetUserByEmail(email string) (User, error) {
 	return u, nil
 }
 
-func (p postgresDataService) GetUserById(id string) (User, error) {
+func (p PostgresDataService) GetUserById(id string) (User, error) {
 	var u User
 	rows, err := p.db.Query("select id, email, is_admin, inserted_at from users where id = $1;", id)
 	if err != nil {
@@ -195,7 +195,7 @@ func (p postgresDataService) GetUserById(id string) (User, error) {
 	return u, nil
 }
 
-func (p postgresDataService) DeletePendingUserSession(id string) error {
+func (p PostgresDataService) DeletePendingUserSession(id string) error {
 	_, err := p.db.Exec("delete from pending_user_sessions where id = $1", id)
 	if err != nil {
 		slog.Error("DeletePendingUserSession", err)
@@ -204,7 +204,7 @@ func (p postgresDataService) DeletePendingUserSession(id string) error {
 	return err
 }
 
-func (p postgresDataService) VerifyUserSession(id, token string) (User, error) {
+func (p PostgresDataService) VerifyUserSession(id, token string) (User, error) {
 	var user User
 	var userSession UserSession
 	query :=
@@ -238,7 +238,7 @@ func (p postgresDataService) VerifyUserSession(id, token string) (User, error) {
 	return p.GetUserById(userSession.UserId)
 }
 
-func (p postgresDataService) GetAllUserSessions(userId string) ([]UserSession, error) {
+func (p PostgresDataService) GetAllUserSessions(userId string) ([]UserSession, error) {
 	sessions := make([]UserSession, 0)
 
 	query :=
@@ -264,7 +264,7 @@ func (p postgresDataService) GetAllUserSessions(userId string) ([]UserSession, e
 	return sessions, nil
 }
 
-func (p postgresDataService) DeleteUserSession(userId, sessionId string) error {
+func (p PostgresDataService) DeleteUserSession(userId, sessionId string) error {
 	_, err := p.db.Exec("delete from user_sessions where id = $1 and user_id = $2", sessionId, userId)
 	if err != nil {
 		slog.Error("DeleteUserSession", err)

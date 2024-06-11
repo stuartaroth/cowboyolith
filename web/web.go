@@ -49,7 +49,7 @@ func GetTemplates(pattern string) (*template.Template, error) {
 	return template.ParseGlob(pattern)
 }
 
-func GetMux(staticDirectory string, templates *template.Template, dataService data.DataService, emailService email.EmailService) (*http.ServeMux, error) {
+func GetMux(staticDirectory string, templates *template.Template, dataService data.PostgresDataService, emailService email.SesEmailService) (*http.ServeMux, error) {
 	myHandlers, err := handlers.NewHandlers(dataService, emailService, templates)
 	if err != nil {
 		return nil, err
