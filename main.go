@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/stuartaroth/cowboyolith/config"
 	"github.com/stuartaroth/cowboyolith/data"
 	"github.com/stuartaroth/cowboyolith/email"
 	"github.com/stuartaroth/cowboyolith/web"
@@ -11,16 +12,15 @@ import (
 )
 
 func main() {
-	slogger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	slog.SetDefault(slogger)
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
 
-	webServerUrl, webServerPort, webServerCertFile, webServerKeyFile, err := web.GetWebServerConfig()
+	webServerUrl, webServerPort, webServerCertFile, webServerKeyFile, err := config.GetWebServerConfig()
 	if err != nil {
 		slog.Error("GetWebServerConfig", err)
 		os.Exit(1)
 	}
 
-	host, port, dbname, user, password, sslmode, err := data.GetDataServiceConfig()
+	host, port, dbname, user, password, sslmode, err := config.GetDataServiceConfig()
 	if err != nil {
 		slog.Error("GetDataServiceConfig", err)
 		os.Exit(1)
@@ -32,13 +32,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	templates, err := web.GetTemplates("templates/*")
+	templates, err := config.GetTemplates("templates/*")
 	if err != nil {
 		slog.Error("GetTemplates", err)
 		os.Exit(1)
 	}
 
-	sendEmails := os.Getenv("SEND_EMAILS") == "true"
+	sendEmails := config.GetSendEmails()
 	emailService, err := email.NewSesEmailService(webServerUrl, templates, sendEmails)
 	if err != nil {
 		slog.Error("NewSesEmailService", err)

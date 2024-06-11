@@ -53,7 +53,7 @@ func (h Handlers) GetCurrentUserAndSession(r *http.Request) (data.User, string, 
 	return user, sessionId, nil
 }
 
-func (h Handlers) Pre(handlerFunc http.HandlerFunc) http.HandlerFunc {
+func (h Handlers) Authorized(handlerFunc http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "TRACE" {
 			w.WriteHeader(http.StatusMethodNotAllowed)

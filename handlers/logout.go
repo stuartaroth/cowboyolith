@@ -8,11 +8,6 @@ import (
 )
 
 func (h Handlers) LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodTrace {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
 	user := r.Context().Value(constants.User).(data.User)
 	sessionId := r.Context().Value(constants.SessionId).(string)
 	err := h.DataService.DeleteUserSession(user.Id, sessionId)
