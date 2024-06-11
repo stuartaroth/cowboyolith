@@ -9,13 +9,14 @@ import (
 
 func (h Handlers) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		redirectToIndex(w, r)
+		h.templates.ExecuteTemplate(w, "404", map[string]string{"Title": "Not Found"})
 		return
 	}
 
 	user := r.Context().Value(constants.User).(data.User)
 
 	templateData := struct {
+		Title string
 		Email string
 	}{
 		Email: user.Email,

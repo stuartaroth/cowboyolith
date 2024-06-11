@@ -17,9 +17,11 @@ func (h Handlers) SessionsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	templateData := struct {
+		Title     string
 		Sessions  []data.UserSession
 		SessionId string
 	}{
+		Title:     "sessions",
 		Sessions:  sessions,
 		SessionId: sessionId,
 	}
