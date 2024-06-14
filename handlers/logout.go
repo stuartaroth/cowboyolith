@@ -12,7 +12,7 @@ func (h Handlers) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	sessionId := r.Context().Value(constants.SessionId).(string)
 	err := h.DataService.DeleteUserSession(user.Id, sessionId)
 	if err != nil {
-		slog.Error("error in logout handler", err)
+		slog.Error(err.Error())
 	}
 
 	redirectToLogin(w, r)

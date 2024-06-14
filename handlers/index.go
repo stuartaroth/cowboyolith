@@ -24,7 +24,7 @@ func (h Handlers) IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := h.templates.ExecuteTemplate(w, "index", templateData)
 	if err != nil {
-		slog.Error("h.templates.ExecuteTemplate(w, \"index\", templateData)", err)
+		slog.Error(err.Error())
 		return
 	}
 }

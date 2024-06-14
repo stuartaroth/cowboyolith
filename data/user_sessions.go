@@ -21,7 +21,7 @@ func (p PostgresDataService) CreateUserSession(dbTx *sql.Tx, userId, id, cookieT
 	salt := uuid.NewString()
 	hashedCookieTokenValue, err := hash(cookieTokenValue, salt)
 	if err != nil {
-		slog.Error("hash", err)
+		slog.Error(err.Error())
 		return err
 	}
 
@@ -39,7 +39,7 @@ func (p PostgresDataService) CreateUserSession(dbTx *sql.Tx, userId, id, cookieT
 func (p PostgresDataService) DeleteUserSession(userId, sessionId string) error {
 	_, err := p.db.Exec("delete from user_sessions where id = $1 and user_id = $2", sessionId, userId)
 	if err != nil {
-		slog.Error("DeleteUserSession", err)
+		slog.Error(err.Error())
 	}
 
 	return err

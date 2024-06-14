@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
+	"log/slog"
 	"os"
 	"strings"
 )
@@ -83,4 +84,17 @@ func GetDataServiceConfig() (string, string, string, string, string, string, err
 
 func GetSendEmails() bool {
 	return os.Getenv("SEND_EMAILS") == "true"
+}
+
+func GetLogLevel() slog.Level {
+	switch os.Getenv("LOG_LEVEL") {
+	case "info":
+		return slog.LevelInfo
+	case "warn":
+		return slog.LevelWarn
+	case "error":
+		return slog.LevelError
+	default:
+		return slog.LevelDebug
+	}
 }

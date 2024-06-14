@@ -28,7 +28,7 @@ func (h Handlers) SessionsHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = h.templates.ExecuteTemplate(w, "sessions", templateData)
 	if err != nil {
-		slog.Error("h.templates.ExecuteTemplate(w, \"sessions\", templateData)", err)
+		slog.Error(err.Error())
 		return
 	}
 }

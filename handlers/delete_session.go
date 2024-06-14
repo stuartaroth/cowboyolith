@@ -13,7 +13,7 @@ func (h Handlers) DeleteSessionHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := h.DataService.DeleteUserSession(user.Id, sessionId)
 	if err != nil {
-		slog.Error("error in logout handler", err)
+		slog.Error(err.Error())
 	}
 
 	http.Redirect(w, r, "/sessions", http.StatusSeeOther)

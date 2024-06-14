@@ -27,7 +27,7 @@ func (h Handlers) createPendingUserSessionAndEmail(r *http.Request, userEmail, c
 	go func() {
 		user, err := h.DataService.GetUserByEmail(userEmail)
 		if err != nil {
-			slog.Error("h.DataService.GetUserByEmail", err)
+			slog.Error(err.Error())
 			return
 		}
 
@@ -37,13 +37,13 @@ func (h Handlers) createPendingUserSessionAndEmail(r *http.Request, userEmail, c
 
 		err = h.DataService.CreatePendingUserSession(user.Id, id, cookieTokenValue, ipAddress, userAgent)
 		if err != nil {
-			slog.Error("h.DataService.CreatePendingUserSession", err)
+			slog.Error(err.Error())
 			return
 		}
 
 		_, err = h.EmailService.SendMagicLink(user.Email, id)
 		if err != nil {
-			slog.Error("h.EmailService.SendMagicLink", err)
+			slog.Error(err.Error())
 			return
 		}
 	}()
