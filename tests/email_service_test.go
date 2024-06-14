@@ -2,14 +2,14 @@ package tests
 
 import (
 	"fmt"
+	"github.com/stuartaroth/cowboyolith/config"
 	"github.com/stuartaroth/cowboyolith/email"
-	"github.com/stuartaroth/cowboyolith/web"
 	"strings"
 	"testing"
 )
 
 func TestSendMagicLink(t *testing.T) {
-	templates, err := web.GetTemplates("../templates/*")
+	templates, err := config.GetTemplates("../templates/*")
 	if err != nil {
 		t.Fatal("error GetTemplates()", err)
 	}

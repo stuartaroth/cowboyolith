@@ -42,13 +42,27 @@ func (h Handlers) VerifyMagicLinkHandler(w http.ResponseWriter, r *http.Request)
 	sessionIdValue := uuid.NewString()
 	cookieTokenValue := uuid.NewString()
 
-	err = h.DataService.DeletePendingUserSession(pending.Id)
+	dbTx, err := h.DataService.GetDbTransaction()
 	if err != nil {
 		redirectToIndex(w, r)
 		return
 	}
 
-	err = h.DataService.CreateUserSession(pending.UserId, sessionIdValue, cookieTokenValue, pending.UserAgent)
+	err = h.DataService.DeletePendingUserSession(dbTx, pending.Id)
+	if err != nil {
+		dbTx.Rollback()
+		redirectToIndex(w, r)
+		return
+	}
+
+	err = h.DataService.CreateUserSession(dbTx, pending.UserId, sessionIdValue, cookieTokenValue, pending.UserAgent)
+	if err != nil {
+		dbTx.Rollback()
+		redirectToIndex(w, r)
+		return
+	}
+
+	err = dbTx.Commit()
 	if err != nil {
 		redirectToIndex(w, r)
 		return

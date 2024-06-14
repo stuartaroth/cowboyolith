@@ -74,7 +74,7 @@ func TestSetup(t *testing.T) {
 	userId := uuid.NewString()
 	userEmail := "test@gmail.com"
 
-	err = dataService.CreateUser(userId, userEmail, true)
+	err = dataService.CreateUser(nil, userId, userEmail, true)
 	if err != nil {
 		t.Fatal(err)
 	}

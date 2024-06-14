@@ -69,11 +69,15 @@ func (p PostgresDataService) GetUserById(id string) (User, error) {
 	return u, nil
 }
 
-func (p PostgresDataService) CreateUser(id, email string, isAdmin bool) error {
-	_, err := p.db.Exec("insert into users (id, email, is_admin) values ($1, $2, $3);", id, email, isAdmin)
-	if err != nil {
-		return err
+func (p PostgresDataService) CreateUser(dbTx *sql.Tx, id, email string, isAdmin bool) error {
+	var err error
+	insertUserQuery := "insert into users (id, email, is_admin) values ($1, $2, $3);"
+
+	if dbTx != nil {
+		_, err = dbTx.Exec(insertUserQuery, id, email, isAdmin)
+	} else {
+		_, err = p.db.Exec(insertUserQuery, id, email, isAdmin)
 	}
 
-	return nil
+	return err
 }

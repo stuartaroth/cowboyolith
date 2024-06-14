@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/google/uuid"
-	"log/slog"
 )
 
 func ScanPendingUserSession(rows *sql.Rows) (PendingUserSession, error) {
@@ -66,10 +65,14 @@ func (p PostgresDataService) VerifyPendingUserSession(id, cookieTokenValue strin
 	return u, nil
 }
 
-func (p PostgresDataService) DeletePendingUserSession(id string) error {
-	_, err := p.db.Exec("delete from pending_user_sessions where id = $1", id)
-	if err != nil {
-		slog.Error("DeletePendingUserSession", err)
+func (p PostgresDataService) DeletePendingUserSession(dbTx *sql.Tx, id string) error {
+	var err error
+	deletePendingUserQuery := "delete from pending_user_sessions where id = $1"
+
+	if dbTx != nil {
+		_, err = dbTx.Exec(deletePendingUserQuery, id)
+	} else {
+		_, err = p.db.Exec(deletePendingUserQuery, id)
 	}
 
 	return err

@@ -17,7 +17,7 @@ func ScanUserSession(rows *sql.Rows) (UserSession, error) {
 	return u, nil
 }
 
-func (p PostgresDataService) CreateUserSession(userId, id, cookieTokenValue, userAgent string) error {
+func (p PostgresDataService) CreateUserSession(dbTx *sql.Tx, userId, id, cookieTokenValue, userAgent string) error {
 	salt := uuid.NewString()
 	hashedCookieTokenValue, err := hash(cookieTokenValue, salt)
 	if err != nil {
@@ -25,12 +25,15 @@ func (p PostgresDataService) CreateUserSession(userId, id, cookieTokenValue, use
 		return err
 	}
 
-	_, err = p.db.Exec("insert into user_sessions (id, user_id, hashed_cookie_token, salt, user_agent) values ($1, $2, $3, $4, $5);", id, userId, hashedCookieTokenValue, salt, userAgent)
-	if err != nil {
-		return err
+	createUserSessionQuery := "insert into user_sessions (id, user_id, hashed_cookie_token, salt, user_agent) values ($1, $2, $3, $4, $5);"
+
+	if dbTx != nil {
+		_, err = dbTx.Exec(createUserSessionQuery, id, userId, hashedCookieTokenValue, salt, userAgent)
+	} else {
+		_, err = p.db.Exec(createUserSessionQuery, id, userId, hashedCookieTokenValue, salt, userAgent)
 	}
 
-	return nil
+	return err
 }
 
 func (p PostgresDataService) DeleteUserSession(userId, sessionId string) error {

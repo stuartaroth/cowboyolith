@@ -24,6 +24,10 @@ func NewPostgresDataService(host, port, dbname, user, password, sslmode string) 
 	}, nil
 }
 
+func (p PostgresDataService) GetDbTransaction() (*sql.Tx, error) {
+	return p.db.Begin()
+}
+
 func hash(key, salt string) (string, error) {
 	bits, err := bcrypt.GenerateFromPassword(getKeySaltBits(key, salt), bcrypt.DefaultCost)
 	if err != nil {
