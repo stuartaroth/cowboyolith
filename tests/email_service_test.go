@@ -22,9 +22,9 @@ func TestSendMagicLink(t *testing.T) {
 		t.Fatal("error NewSesEmailService", err)
 	}
 
-	html, err := emailService.SendMagicLink("", queryToken)
+	html, err := emailService.SendMagicCode("", queryToken)
 	if err != nil {
-		t.Fatal("error SendMagicLink", err)
+		t.Fatal("error SendMagicCode", err)
 	}
 
 	stringsToCheck := []string{

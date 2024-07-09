@@ -3,7 +3,6 @@ package email
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ses"
 	"github.com/aws/aws-sdk-go-v2/service/ses/types"
@@ -37,7 +36,7 @@ func NewSesEmailService(webServerUrl string, templates *template.Template, sendE
 	}, nil
 }
 
-func (s SesEmailService) SendMagicLink(email, queryToken string) (string, error) {
+func (s SesEmailService) SendMagicCode(email, magicCode string) (string, error) {
 	emailDestination := types.Destination{
 		BccAddresses: []string{},
 		CcAddresses:  []string{},
@@ -46,16 +45,14 @@ func (s SesEmailService) SendMagicLink(email, queryToken string) (string, error)
 
 	charset := "UTF-8"
 
-	verifyMagicLinkUrl := fmt.Sprintf("%v/verify-magic-link?token=%v", s.webServerUrl, queryToken)
-
 	templateData := struct {
-		VerifyMagicLinkUrl string
+		MagicCode string
 	}{
-		VerifyMagicLinkUrl: verifyMagicLinkUrl,
+		MagicCode: magicCode,
 	}
 
 	bits := new(bytes.Buffer)
-	err := s.templates.ExecuteTemplate(bits, "magic-link-email", templateData)
+	err := s.templates.ExecuteTemplate(bits, "magic-code-email", templateData)
 	if err != nil {
 		return "", err
 	}
@@ -72,7 +69,7 @@ func (s SesEmailService) SendMagicLink(email, queryToken string) (string, error)
 		Text: nil,
 	}
 
-	subjectLine := "Cowboyolith Magic Link"
+	subjectLine := "Cowboyolith Magic Code"
 
 	emailSubject := types.Content{
 		Data:    &subjectLine,

@@ -4,7 +4,16 @@
     <div>
         {{ template "header" }}
         <main class="container">
-            <div>An email will be sent</div>
+            <form action="/verify-magic-code" method="POST">
+                <fieldset>
+                    <label>
+                        Enter your code here:
+                        <input name="magic-code" />
+                    </label>
+                </fieldset>
+                <input type="submit"/>
+            </form>
+
         </main>
     </div>
 </body>

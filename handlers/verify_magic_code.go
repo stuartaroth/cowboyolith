@@ -6,15 +6,10 @@ import (
 	"net/http"
 )
 
-func (h Handlers) VerifyMagicLinkHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodTrace {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
+func (h Handlers) VerifyMagicCodeHandler(w http.ResponseWriter, r *http.Request) {
+	magicCode := r.FormValue(constants.MagicCode)
 
-	queryTokenValue := r.URL.Query().Get("token")
-
-	if queryTokenValue == "" {
+	if magicCode == "" {
 		redirectToIndex(w, r)
 		return
 	}
@@ -33,7 +28,7 @@ func (h Handlers) VerifyMagicLinkHandler(w http.ResponseWriter, r *http.Request)
 
 	clearCookie(w, constants.PendingCookieToken)
 
-	pending, err := h.DataService.VerifyPendingUserSession(queryTokenValue, pendingCookieTokenValue)
+	pending, err := h.DataService.VerifyPendingUserSession(magicCode, pendingCookieTokenValue)
 	if err != nil {
 		redirectToIndex(w, r)
 		return

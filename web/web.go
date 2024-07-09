@@ -22,7 +22,7 @@ func GetMux(staticDirectory string, templates *template.Template, dataService da
 	myMux.HandleFunc("/login", myHandlers.LoginHandler)
 
 	myMux.HandleFunc("POST /email-request", myHandlers.EmailRequestHandler)
-	myMux.HandleFunc("/verify-magic-link", myHandlers.VerifyMagicLinkHandler)
+	myMux.HandleFunc("POST /verify-magic-code", myHandlers.VerifyMagicCodeHandler)
 
 	// all logged in can use myHandlers.Authorized
 	myMux.HandleFunc("/", myHandlers.Authorized(myHandlers.IndexHandler))

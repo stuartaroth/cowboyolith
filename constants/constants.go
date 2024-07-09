@@ -7,5 +7,6 @@ const (
 	SessionId          = "sessionId"
 	CookieSessionId    = "cookieSessionId"
 	CookieToken        = "cookieToken"
+	MagicCode          = "magic-code"
 	OneWeekInSeconds   = 604800
 )

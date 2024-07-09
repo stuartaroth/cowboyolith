@@ -1,10 +1,11 @@
-{{ define "magic-link-email" }}
+{{ define "magic-code-email" }}
 {{ template "html-open" }}
 <body>
     <div>
         {{ template "header" }}
         <main class="container">
-            <div><a href='{{ .VerifyMagicLinkUrl }}'>Click here to login</a></div>
+            <div>Copy the below code</div>
+            <div><pre>{{ .MagicCode }}</pre></div>
         </main>
     </div>
 </body>

@@ -41,7 +41,7 @@ func (h Handlers) createPendingUserSessionAndEmail(r *http.Request, userEmail, c
 			return
 		}
 
-		_, err = h.EmailService.SendMagicLink(user.Email, id)
+		_, err = h.EmailService.SendMagicCode(user.Email, id)
 		if err != nil {
 			slog.Error(err.Error())
 			return
