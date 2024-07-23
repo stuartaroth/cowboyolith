@@ -82,8 +82,14 @@ func GetDataServiceConfig() (string, string, string, string, string, string, err
 	return host, port, dbname, user, password, sslmode, nil
 }
 
-func GetSendEmails() bool {
-	return os.Getenv("SEND_EMAILS") == "true"
+func GetEmailConfig() (bool, string, error) {
+	shouldSend := os.Getenv("EMAIL_SHOULD_SEND") == "true"
+	sendingAddress := os.Getenv("EMAIL_SENDING_ADDRESS")
+	if sendingAddress == "" {
+		return false, "", errors.New("must prove non empty EMAIL_SENDING_ADDRESS")
+	}
+
+	return shouldSend, sendingAddress, nil
 }
 
 func GetLogLevel() slog.Level {

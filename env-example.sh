@@ -12,7 +12,8 @@ export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=password
 export POSTGRES_SSL_MODE=disable
 
-export SEND_EMAILS=true
+export EMAIL_SHOULD_SEND=true
+export EMAIL_SENDING_ADDRESS=youremailhere@gmail.com
 
 export AWS_ACCESS_KEY_ID=yourkeyhere
 export AWS_SECRET_ACCESS_KEY=yourkeyhere

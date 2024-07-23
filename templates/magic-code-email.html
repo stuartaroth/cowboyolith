@@ -1,13 +1,15 @@
 {{ define "magic-code-email" }}
-{{ template "html-open" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
 <body>
     <div>
-        {{ template "header" }}
-        <main class="container">
-            <div>Copy the below code</div>
-            <div><pre>{{ .MagicCode }}</pre></div>
-        </main>
+        <div><h1>cowboyolith</h1></div>
+        <div>Your code is valid for five minutes and must be used in the requesting browser</div>
+        <div><h3>{{ .MagicCode }}</h3></div>
     </div>
 </body>
-{{ template "html-close" }}
+</html>
 {{ end }}

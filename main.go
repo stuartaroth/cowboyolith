@@ -41,8 +41,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	sendEmails := config.GetSendEmails()
-	emailService, err := email.NewSesEmailService(webServerUrl, templates, sendEmails)
+	shouldSend, sendingAddress, err := config.GetEmailConfig()
+	if err != nil {
+		slog.Error(err.Error())
+		os.Exit(1)
+	}
+
+	emailService, err := email.NewSesEmailService(webServerUrl, templates, shouldSend, sendingAddress)
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)

@@ -10,16 +10,17 @@ import (
 )
 
 type SesEmailService struct {
-	webServerUrl string
-	emailClient  *ses.Client
-	templates    *template.Template
-	sendEmails   bool
+	webServerUrl   string
+	emailClient    *ses.Client
+	templates      *template.Template
+	shouldSend     bool
+	sendingAddress string
 }
 
-func NewSesEmailService(webServerUrl string, templates *template.Template, sendEmails bool) (SesEmailService, error) {
+func NewSesEmailService(webServerUrl string, templates *template.Template, shouldSend bool, sendingAddress string) (SesEmailService, error) {
 	var emailClient *ses.Client
 
-	if sendEmails {
+	if shouldSend {
 		cfg, err := config.LoadDefaultConfig(context.TODO())
 		if err != nil {
 			return SesEmailService{}, err
@@ -29,18 +30,17 @@ func NewSesEmailService(webServerUrl string, templates *template.Template, sendE
 	}
 
 	return SesEmailService{
-		webServerUrl: webServerUrl,
-		emailClient:  emailClient,
-		templates:    templates,
-		sendEmails:   sendEmails,
+		webServerUrl:   webServerUrl,
+		emailClient:    emailClient,
+		templates:      templates,
+		shouldSend:     shouldSend,
+		sendingAddress: sendingAddress,
 	}, nil
 }
 
 func (s SesEmailService) SendMagicCode(email, magicCode string) (string, error) {
 	emailDestination := types.Destination{
-		BccAddresses: []string{},
-		CcAddresses:  []string{},
-		ToAddresses:  []string{email},
+		ToAddresses: []string{email},
 	}
 
 	charset := "UTF-8"
@@ -81,16 +81,14 @@ func (s SesEmailService) SendMagicCode(email, magicCode string) (string, error) 
 		Subject: &emailSubject,
 	}
 
-	sendingEmailAddress := "stuartaroth@gmail.com"
-
 	sendMailInput := ses.SendEmailInput{
 		Destination: &emailDestination,
 		Message:     &emailMessage,
-		Source:      &sendingEmailAddress,
-		ReturnPath:  &sendingEmailAddress,
+		Source:      &s.sendingAddress,
+		ReturnPath:  &s.sendingAddress,
 	}
 
-	if s.sendEmails {
+	if s.shouldSend {
 		_, err = s.emailClient.SendEmail(context.TODO(), &sendMailInput)
 		if err != nil {
 			return "", err
