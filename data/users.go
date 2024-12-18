@@ -3,18 +3,18 @@ package data
 import (
 	"database/sql"
 	. "github.com/go-jet/jet/v2/postgres"
+	"github.com/google/uuid"
 	"github.com/stuartaroth/cowboyolith/data/gen/cowboyolith/public/model"
 	. "github.com/stuartaroth/cowboyolith/data/gen/cowboyolith/public/table"
 )
 
-func ScanUser(rows *sql.Rows) (User, error) {
-	var u User
-	err := rows.Scan(&u.Id, &u.Email, &u.IsAdmin, &u.InsertedAt)
-	if err != nil {
-		return u, err
+func JetUserToUser(jetUser model.Users) User {
+	return User{
+		Id:         jetUser.ID.String(),
+		Email:      jetUser.Email,
+		IsAdmin:    *jetUser.IsAdmin,
+		InsertedAt: jetUser.InsertedAt.String(),
 	}
-
-	return u, nil
 }
 
 func (p PostgresDataService) GetAllUsers() ([]User, error) {
@@ -30,12 +30,7 @@ func (p PostgresDataService) GetAllUsers() ([]User, error) {
 	}
 
 	for _, jetUser := range jetUsers {
-		users = append(users, User{
-			Id:         jetUser.ID.String(),
-			Email:      jetUser.Email,
-			IsAdmin:    *jetUser.IsAdmin,
-			InsertedAt: jetUser.InsertedAt.String(),
-		})
+		users = append(users, JetUserToUser(jetUser))
 	}
 
 	return users, nil
@@ -43,48 +38,57 @@ func (p PostgresDataService) GetAllUsers() ([]User, error) {
 
 func (p PostgresDataService) GetUserByEmail(email string) (User, error) {
 	var u User
-	rows, err := p.db.Query("select id, email, is_admin, inserted_at from users where email = $1;", email)
+
+	var jetUser model.Users
+	jetStatement := SELECT(Users.ID, Users.Email, Users.IsAdmin, Users.InsertedAt).FROM(Users).WHERE(Users.Email.EQ(Text(email)))
+
+	err := jetStatement.Query(p.db, &jetUser)
 	if err != nil {
 		return u, err
 	}
 
-	for rows.Next() {
-
-		u, err = ScanUser(rows)
-		if err != nil {
-			return u, err
-		}
-	}
-
-	return u, nil
+	return JetUserToUser(jetUser), nil
 }
 
 func (p PostgresDataService) GetUserById(id string) (User, error) {
 	var u User
-	rows, err := p.db.Query("select id, email, is_admin, inserted_at from users where id = $1;", id)
+	parsedUuid, err := uuid.Parse(id)
 	if err != nil {
 		return u, err
 	}
 
-	for rows.Next() {
+	var jetUser model.Users
 
-		u, err = ScanUser(rows)
-		if err != nil {
-			return u, err
-		}
+	jetStatement := SELECT(Users.ID, Users.Email, Users.IsAdmin, Users.InsertedAt).FROM(Users).WHERE(Users.ID.EQ(UUID(parsedUuid)))
+
+	err = jetStatement.Query(p.db, &jetUser)
+	if err != nil {
+		return u, err
 	}
 
-	return u, nil
+	return JetUserToUser(jetUser), nil
 }
 
 func (p PostgresDataService) CreateUser(dbTx *sql.Tx, id, email string, isAdmin bool) error {
 	var err error
-	insertUserQuery := "insert into users (id, email, is_admin) values ($1, $2, $3);"
+
+	parsedUuid, err := uuid.Parse(id)
+	if err != nil {
+		return err
+	}
+
+	jetUser := model.Users{
+		ID:      parsedUuid,
+		Email:   email,
+		IsAdmin: &isAdmin,
+	}
+
+	jetStatement := Users.INSERT(Users.ID, Users.Email, Users.IsAdmin).MODEL(jetUser)
 
 	if dbTx != nil {
-		_, err = dbTx.Exec(insertUserQuery, id, email, isAdmin)
+		_, err = jetStatement.Exec(dbTx)
 	} else {
-		_, err = p.db.Exec(insertUserQuery, id, email, isAdmin)
+		_, err = jetStatement.Exec(p.db)
 	}
 
 	return err
