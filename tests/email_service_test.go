@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"fmt"
 	"github.com/stuartaroth/cowboyolith/config"
 	"github.com/stuartaroth/cowboyolith/email"
 	"strings"
@@ -15,21 +14,21 @@ func TestSendMagicLink(t *testing.T) {
 	}
 
 	url := "url"
-	queryToken := "queryToken"
+	magicCode := "magicCode"
 
-	emailService, err := email.NewSesEmailService(url, templates, false)
+	emailService, err := email.NewSesEmailService(url, templates, false, "sending@gmail.com")
 	if err != nil {
 		t.Fatal("error NewSesEmailService", err)
 	}
 
-	html, err := emailService.SendMagicCode("", queryToken)
+	html, err := emailService.SendMagicCode("", magicCode)
 	if err != nil {
 		t.Fatal("error SendMagicCode", err)
 	}
 
 	stringsToCheck := []string{
-		"Click here to login",
-		fmt.Sprintf("href='%v/verify-magic-link?token=%v'", url, queryToken),
+		"Your code is valid for five minutes and must be used in the requesting browser",
+		magicCode,
 	}
 
 	for _, i := range stringsToCheck {

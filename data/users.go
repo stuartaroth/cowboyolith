@@ -1,6 +1,11 @@
 package data
 
-import "database/sql"
+import (
+	"database/sql"
+	. "github.com/go-jet/jet/v2/postgres"
+	"github.com/stuartaroth/cowboyolith/data/gen/cowboyolith/public/model"
+	. "github.com/stuartaroth/cowboyolith/data/gen/cowboyolith/public/table"
+)
 
 func ScanUser(rows *sql.Rows) (User, error) {
 	var u User
@@ -16,18 +21,21 @@ func (p PostgresDataService) GetAllUsers() ([]User, error) {
 	emptyUsers := make([]User, 0)
 	users := make([]User, 0)
 
-	rows, err := p.db.Query("select id, email, is_admin, inserted_at from users;")
+	jetUsers := []model.Users{}
+	jetStatement := SELECT(Users.ID, Users.Email, Users.IsAdmin, Users.InsertedAt).FROM(Users)
+
+	err := jetStatement.Query(p.db, &jetUsers)
 	if err != nil {
 		return emptyUsers, err
 	}
 
-	for rows.Next() {
-		user, err := ScanUser(rows)
-		if err != nil {
-			return emptyUsers, err
-		}
-
-		users = append(users, user)
+	for _, jetUser := range jetUsers {
+		users = append(users, User{
+			Id:         jetUser.ID.String(),
+			Email:      jetUser.Email,
+			IsAdmin:    *jetUser.IsAdmin,
+			InsertedAt: jetUser.InsertedAt.String(),
+		})
 	}
 
 	return users, nil
